@@ -5,12 +5,20 @@ if hasattr(sys, '_MEIPASS'):
     os.environ['KIVY_NO_CONSOLELOG'] = '1'
 
 import kivy
+from kivy.config import Config
+Config.set('graphics', 'resizable', False)
+
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.app import Builder
 from kivy.core.window import Window
-import re
+from kivy.properties import StringProperty
+
+
 import decimal
+
+
+
 
 
 
@@ -25,27 +33,28 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
-# Set the app size
-Window.size = (500, 700)
+
 
 # Designate our .kv design file
 Builder.load_file(resource_path("calc.kv"))
 
+
+
 class CalcLayout(Widget):
-    
+
+    expression = StringProperty('')
     def __init__(self, **kwargs):
         super(CalcLayout, self).__init__(**kwargs)
         self.expression = ''
         self.new_operad = True
         self.new_expression = True
-        self.error = False
-        
+        self.error = False   
+    
         
         
         
     def clear(self):
         self.ids.input.text = '0'
-        self.ids.expression.text = ''
         self.expression = ''
         self.new_expression = True
         self.new_operad = True
@@ -73,7 +82,6 @@ class CalcLayout(Widget):
         
         if self.new_expression: 
             self.new_expression = False
-            self.ids.expression.text = ''
             self.expression = ''
         
 
@@ -85,21 +93,7 @@ class CalcLayout(Widget):
         
         
                       
-    def operator_press(self, operator):
-        if self.error:
-            self.clear()
-        if self.new_expression:
-            self.new_expression = False
-            self.ids.expression.text = ''
-            self.expression = ''
-        print('befor: ', self.expression)
-        self.ids.expression.text += f'{self.ids.input.text}{operator}'
-        if '.' in self.ids.input.text:
-            self.expression += f'{self.ids.input.text}{operator}'
-        else:
-            self.expression += f'{self.ids.input.text}{operator}'
-        print('after : ', self.expression)
-        self.calculate()
+    
             
             
     # create decimal function
@@ -109,14 +103,12 @@ class CalcLayout(Widget):
         if self.new_expression:
             self.new_expression = False
             self.ids.input.text = ''
-            self.ids.expression.text = ''
             self.expression = ''
             self.new_operad = False
             
         if not self.ids.input.text:
              self.ids.input.text = '0.'
-        else:
-            if '.' not in self.ids.input.text:
+        elif '.' not in self.ids.input.text:
                 self.ids.input.text += '.'
             
             
@@ -130,34 +122,40 @@ class CalcLayout(Widget):
             self.ids.input.text = f'-{self.ids.input.text}' 
             
         
-        
+    def operator_press(self, operator):
+        if self.error:
+            self.clear()
+        if self.new_expression:
+            self.new_expression = False
+            self.expression = ''
+        self.expression += f'{self.ids.input.text}{operator}'
+        self.calculate()    
             
         
         
     def equals(self):
+        print('equals')
         if not self.new_expression:
-            self.ids.expression.text += self.ids.input.text
-            if '.' in self.ids.input.text:
-                self.expression = f'{self.expression}{self.ids.input.text}'
-            else:
-                self.expression = f'{self.expression}{self.ids.input.text}.0' 
+            self.expression += self.ids.input.text
             self.calculate()
-            self.ids.expression.text = f'{self.ids.expression.text } = {self.ids.input.text}'
+            self.expression = f'{self.expression} = {self.ids.input.text}'
             self.new_expression = True
     
             
             
     def calculate(self):
-        exp = ''
+       
         try:
-            if self.expression.endswith(('-', '+', '*', '/')):
-                exp = self.expression[:-1]
-            else:
-                exp = self.expression
-            print(decimal.getcontext())
+           
+            exp = self.expression
+            if exp.endswith(('-', '+', 'x', '÷')):
+                exp = exp[:-1]
+            exp = exp.replace('÷','/')
+            exp = exp.replace('x','*')
             result = decimal.Decimal(eval(exp))
             result = result.quantize(decimal.Decimal('0.00000000000'))
-            self.ids.input.text = str(result.normalize())
+            result = self.format_result(result)
+            self.ids.input.text= str(result)
             self.new_operad = True
         except ZeroDivisionError:
             self.ids.input.text = "Can't Divide by Zero"
@@ -169,24 +167,44 @@ class CalcLayout(Widget):
             self.new_expression = True
             self.new_operad = True
             self.error = True
-        except SyntaxError:
+        except SyntaxError :
             self.ids.input.text =  "Invalid Input"
             self.new_expression = True
             self.new_operad = True
             self.error = True
-        except: 
+        except Exception as e:
+            print(e)
             self.ids.input.text =  "Nunkown error"
             self.new_expression = True
             self.new_operad = True
             self.error = True
         
-       
-        
+    def format_result(self, result: decimal.Decimal ):
+        r = str(result).rstrip('0')
+        if r.endswith('.'):
+            r = r[:-1]
+        if len(r) > 13:
+            result = result.normalize()
+            self.ids.input.font_size = 32
+            self.ids.expression.font_size = 16
+        else:
+            result = r
+            self.ids.input.font_size = 64
+            self.ids.expression.font_size = 32
+
+        return result
+
+
     
 class ClacApp(App):
     def build(self): 
-        #Window.clearcolor = (1,1,1,1)
+        # Set the app size
+        Window.size = (500, 800)
+
         return CalcLayout()
+    
+   
+    
 
 if __name__ == "__main__":
     ClacApp().run() 

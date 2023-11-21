@@ -1,153 +1,136 @@
+#:set white (1,1,1,1)
+#:set black (0,0,0,1)
+
+#:set liter_orange (247/255, 193/255, 111/255,1)
+#:set orange (255/255,159/255,10/255,1)
+
+#:set darker_gray (51/255,51/255,51/255,1)
+#:set dark_gray (80/255,80/255,80/255,1)
+
+#:set lite_gray (164/255,164/255,164/255,1)
+#:set liter_gray (180/255,180/255,180/255,1)
+
+
+<CircleButton@Button>
+    color_up: (0,0,0,1)
+    color_down: (1,1,1,1)
+    background_normal: ''
+    background_color: (0,0,0,0)
+    color: white
+    size_hint: (.2, .2)
+    font_size: 32
+    canvas.before:
+        Color:
+            rgba: self.color_up if self.state == 'normal' else self.color_down
+        Ellipse:
+            size: self.height, self.height
+            pos: self.pos   
+   
+
+<DigitButton@CircleButton>
+    color_up: darker_gray
+    color_down: dark_gray
+    border : (0, 0, 0 ,0)
+    on_press: app.root.add_digit(self.text)
+    
+<OperatorButton@CircleButton>
+    color_up: orange
+    color_down: liter_orange
+    border : (0, 0, 0 ,0)
+    on_press: app.root.operator_press(self.text)
+
+<SymboleButton@CircleButton>
+    color: (0, 0, 0, 1)
+    color_up:  lite_gray
+    color_down: liter_gray
+    border : (0, 0, 0 ,0)
+
+
+
+
+
+
 <CalcLayout>
     BoxLayout:
         orientation: "vertical"
         size: root.width, root.height
-        
+        spacing: 10
+        padding: 10
+
+        Label:
+            id: expression
+            text: root.expression
+            halign: "right"
+            font_size: 32
+            color : (164/255, 1164/255, 1164/255, 1)
+            size_hint: (1, .10)
+
         TextInput:
             id: input
             text: "0"
             halign: "right"
-            font_size: 60
-            size_hint: (1, .15)
-        Label:
-            id: expression
-            text: ''
-            halign: "right"
-            font_size: 16
-            color : (.1, .1, .1, 1)
-            size_hint: (1, .10)
-            canvas.before:
-                Color:
-                    rgba: (250/255, 218/255, 130/255,1)
-                Rectangle:
-                    pos: self.pos
-                    size: self.width, self.height
-
+            font_size: 64
+            size_hint: (1, .2)
+            foreground_color: (1, 1, 1, 1)
+            background_color: (0,0,0,1)
 
 
         GridLayout:
             cols: 4
             rows: 5
+            padding: 10
+            spacing: 10
 
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
-                text: "%"
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            SymboleButton:
                 text: "C"
                 on_press: root.clear()
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
-                text: "CE"
-                id: clear
+            SymboleButton:
+                text: U"\u00AB"
                 on_press: root.remove()
-                
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
-                text: "/"
-                on_press: root.operator_press('/')
+            SymboleButton:
+                text: "%"
+            OperatorButton:
+                text: "÷"
 
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            DigitButton:
                 text: "7"
-                background_color: (157/255, 157/255, 157/255, 1)
-                on_press: root.add_digit('7')
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            DigitButton:
                 text: "8"
-                background_color: (157/255, 157/255, 157/255, 1)
-                on_press: root.add_digit('8')
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            DigitButton:
                 text: "9"
-                background_color: (157/255, 157/255, 157/255, 1)
-                on_press: root.add_digit('9')
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            OperatorButton:
                 text: "x"
-                on_press: root.operator_press('*')
             
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            DigitButton:
                 text: "4"
-                background_color: (157/255, 157/255, 157/255, 1)
-                on_press: root.add_digit('4')
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            DigitButton:
                 text: "5"
-                background_color: (157/255, 157/255, 157/255, 1)
-                on_press: root.add_digit('5')
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            DigitButton:
                 text: "6"
-                background_color: (157/255, 157/255, 157/255, 1)
-                on_press: root.add_digit('6')
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            OperatorButton:
                 text: "-"
-                on_press: root.operator_press('-')
             
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            DigitButton:
                 text: "1"
-                background_color: (157/255, 157/255, 157/255, 1)
-                on_press: root.add_digit('1')
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            DigitButton:
                 text: "2"
-                background_color: (157/255, 157/255, 157/255, 1)
-                on_press: root.add_digit('2')
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            DigitButton:
                 text: "3"
-                background_color: (157/255, 157/255, 157/255, 1)
-                on_press: root.add_digit('3')
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            OperatorButton:
                 text: "+"
-                on_press: root.operator_press('+')
             
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            DigitButton:
                 text: "+/-"
-                background_color: (157/255, 157/255, 157/255, 1)
                 on_press: root.flip_sign()
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            DigitButton:
                 text: "0"
-                background_color: (157/255, 157/255, 157/255, 1)
-                on_press: root.add_digit('0')
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            CircleButton:
                 text: "."
-                background_color: (157/255, 157/255, 157/255, 1)
+                color_up: darker_gray
+                down_color: dark_gray
                 on_press: root.dot_press()
-            Button:
-                size_hint: (.2, .2)
-                font_size: 32
+            CircleButton:
                 text: "="
-                background_color: (166/255, 95/255, 83/255, 1)
+                color_up: orange
+                down_color: liter_orange
                 on_press: root.equals()
-
-
-
-        

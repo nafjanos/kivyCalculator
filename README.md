@@ -14,7 +14,7 @@ The Kivy Calculator is a basic calculator application developed using the Kivy f
 
 ## Screenshots
 
-Include screenshots or GIFs of your application to give users a visual representation.
+![Screenshot](screenshot.png)
 
 ## Installation
 
