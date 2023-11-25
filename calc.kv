@@ -1,6 +1,14 @@
 #:set white (1,1,1,1)
 #:set black (0,0,0,1)
 
+#:set lite (70/255, 54/255, 61/255,1)
+#:set dark  (60/255, 45/255, 54/255,1)
+#:set darker (43/255, 26/255, 36/255,1)
+#:set darker_5 (43/255, 26/255, 36/255,.5)
+
+#:set blue (76/255, 194/255, 255/255,1)
+#:set blue2 (86/255, 204/255, 255/255,1)
+
 #:set liter_orange (247/255, 193/255, 111/255,1)
 #:set orange (255/255,159/255,10/255,1)
 
@@ -11,41 +19,34 @@
 #:set liter_gray (180/255,180/255,180/255,1)
 
 
-<CircleButton@Button>
-    color_up: (0,0,0,1)
-    color_down: (1,1,1,1)
-    background_normal: ''
-    background_color: (0,0,0,0)
+<RoundButton@Button>
     color: white
     size_hint: (.2, .2)
-    font_size: 32
+    font_size: 24
+    background_color: (0,0,0,0)
+    btn_color: 70/255, 54/255, 61/255,1
+    background_normal: ''
     canvas.before:
         Color:
-            rgba: self.color_up if self.state == 'normal' else self.color_down
-        Ellipse:
-            size: self.height, self.height
-            pos: self.pos   
-   
+            rgba: root.btn_color
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            #radius: [55, ]
+            
+<CalcButton@RoundButton>
+    btn_color: dark if self.state == 'normal' else lite
 
-<DigitButton@CircleButton>
-    color_up: darker_gray
-    color_down: dark_gray
-    border : (0, 0, 0 ,0)
-    on_press: app.root.add_digit(self.text)
+<DigitButton@RoundButton>
+    btn_color: lite if self.state == 'normal' else dark
+    on_press: app.root.digit_press(self.text)
     
-<OperatorButton@CircleButton>
-    color_up: orange
-    color_down: liter_orange
-    border : (0, 0, 0 ,0)
+<OperatorButton@RoundButton>
+    btn_color: dark if self.state == 'normal' else lite
     on_press: app.root.operator_press(self.text)
 
-<SymboleButton@CircleButton>
-    color: (0, 0, 0, 1)
-    color_up:  lite_gray
-    color_down: liter_gray
-    border : (0, 0, 0 ,0)
-
-
+<SymboleButton@RoundButton>
+    btn_color: dark if self.state == 'normal' else lite
 
 
 
@@ -54,43 +55,51 @@
     BoxLayout:
         orientation: "vertical"
         size: root.width, root.height
-        spacing: 10
-        padding: 10
+        spacing: 5
+        padding: 5
 
         Label:
             id: expression
             text: root.expression
-            halign: "right"
-            font_size: 32
-            color : (164/255, 1164/255, 1164/255, 1)
+            halign: 'right'
+            valign: 'middle'
+            font_size: 16
+            color : liter_gray
             size_hint: (1, .10)
+            text_size: self.size
 
         TextInput:
             id: input
             text: "0"
+            font_size: 48
+            bold: True
             halign: "right"
-            font_size: 64
+            valign: 'middle'
             size_hint: (1, .2)
-            foreground_color: (1, 1, 1, 1)
-            background_color: (0,0,0,1)
+            foreground_color: white
+            background_color: darker
+            background_normal: ''
+            on_text: root.update_text()
+
 
 
         GridLayout:
             cols: 4
             rows: 5
-            padding: 10
-            spacing: 10
+            spacing:2
+            marrgin:2
 
             SymboleButton:
-                text: "C"
+                text: "AC"
                 on_press: root.clear()
             SymboleButton:
-                text: U"\u00AB"
-                on_press: root.remove()
+                text: "CE"
+                on_press: root.clear_input()
             SymboleButton:
-                text: "%"
+                text:  U"\u00AB"
+                on_press: root.remove()
             OperatorButton:
-                text: "÷"
+                text: U"\u00F7"
 
             DigitButton:
                 text: "7"
@@ -119,18 +128,16 @@
             OperatorButton:
                 text: "+"
             
-            DigitButton:
-                text: "+/-"
+            CalcButton:
+                text: U"\u00B1"
+                btn_color: lite if self.state == 'normal' else dark
                 on_press: root.flip_sign()
             DigitButton:
                 text: "0"
-            CircleButton:
-                text: "."
-                color_up: darker_gray
-                down_color: dark_gray
+            CalcButton:
+                text: root.DECIMAL_POINT
+                btn_color: lite if self.state == 'normal' else dark
                 on_press: root.dot_press()
-            CircleButton:
+            CalcButton:
                 text: "="
-                color_up: orange
-                down_color: liter_orange
                 on_press: root.equals()
